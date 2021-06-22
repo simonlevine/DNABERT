@@ -477,6 +477,7 @@ def predict(args, model, tokenizer, prefix=""):
     pred_outputs_dirs = (args.predict_dir,)
     if not os.path.exists(args.predict_dir):
         os.makedirs(args.predict_dir)
+
     softmax = torch.nn.Softmax(dim=1)
 
     predictions = {}
@@ -543,11 +544,16 @@ def predict(args, model, tokenizer, prefix=""):
         pred_output_dir = args.predict_dir
         if not os.path.exists(pred_output_dir):
                os.makedir(pred_output_dir)
+
         output_pred_file = os.path.join(pred_output_dir, "pred_results.npy")
+        output_probs_file = os.path.join(pred_output_dir, "probs_results.npy")
+
         logger.info("***** Pred results {} *****".format(prefix))
         for key in sorted(result.keys()):
             logger.info("  %s = %s", key, str(result[key]))
-        np.save(output_pred_file, probs)
+        np.save(output_probs_file, probs)
+        np.save(output_pred_file, preds)
+
 
 
 def format_attention(attention):
