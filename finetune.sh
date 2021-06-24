@@ -1,19 +1,20 @@
 cd examples
 
 export KMER=6
-export MODEL_PATH=../pretrained_models/6-new-12w-0
-export DATA_PATH=../data/jayavulu/new #sample_data/ft/prom-core/$KMER
+export MODEL_PATH=../dnaBERT_pretrained_models/regression-6-new-12w-0
+export DATA_PATH=../data/jayavulu/regression #sample_data/ft/prom-core/$KMER
 export OUTPUT_PATH=../data/jayavulu/new #./ft/prom-core/$KMER
 
-python run_finetune.py \
+python run_finetune_regression.py \
     --model_type dna \
     --tokenizer_name=dna$KMER \
     --model_name_or_path $MODEL_PATH \
-    --task_name dnaprom \
+    --task_name dnaregression \
+    --output_mode regression \
     --do_train \
     --do_eval \
     --data_dir $DATA_PATH \
-    --max_seq_length 75 \
+    --max_seq_length 256 \
     --per_gpu_eval_batch_size=16   \
     --per_gpu_train_batch_size=16   \
     --learning_rate 2e-4 \

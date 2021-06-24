@@ -533,6 +533,7 @@ def predict(args, model, tokenizer, prefix=""):
             elif args.task_name == "dnasplice":
                 probs = softmax(torch.tensor(preds, dtype=torch.float32)).numpy()
             preds = np.argmax(preds, axis=1)
+
         elif args.output_mode == "regression":
             preds = np.squeeze(preds)
 
@@ -829,6 +830,13 @@ def main():
         help="The name of the task to train selected in the list: " + ", ".join(processors.keys()),
     )
     parser.add_argument(
+        "--output_mode",
+        default=None,
+        type=str,
+        required=False,
+        help="The name of the output mode, \'classification\' or \'regression\'. ",
+    )
+    parser.add_argument(
         "--output_dir",
         default=None,
         type=str,
@@ -1049,7 +1057,14 @@ def main():
     processor = processors[args.task_name]()
     args.output_mode = output_modes[args.task_name]
     label_list = processor.get_labels()
+
+
     num_labels = len(label_list)
+
+    if args.output_mode=='regression':
+        num_labels=1
+
+    logger.warning(f'Using {args.task_name} processor, for labels {label_list}.')
 
     # Load pretrained model and tokenizer
     if args.local_rank not in [-1, 0]:
@@ -1059,6 +1074,7 @@ def main():
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
 
     if not args.do_visualize and not args.do_ensemble_pred:
+
         config = config_class.from_pretrained(
             args.config_name if args.config_name else args.model_name_or_path,
             num_labels=num_labels,
@@ -1076,6 +1092,10 @@ def main():
         config.rnn_dropout = args.rnn_dropout
         config.rnn_hidden = args.rnn_hidden
 
+        if args.task_name=='dnaregression' or args.output_mode == 'regression':
+            config.problem_type='regression'
+            config.num_labels = 1
+
         tokenizer = tokenizer_class.from_pretrained(
             args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
             do_lower_case=args.do_lower_case,
@@ -1090,6 +1110,13 @@ def main():
             config=config,
             cache_dir=args.cache_dir if args.cache_dir else None,
         )
+
+        if args.task_name=='dnaregression':
+            logger.critical('Altering model for regression...')
+            # model.config.num_labels = 1
+            # model.config.problem_type='regression'
+            model.classifier.out_features=1
+
         
         logger.info('finish loading model')
 
@@ -1158,6 +1185,14 @@ def main():
         logger.info("Predict using the following checkpoint: %s", checkpoint)
         prefix = ''
         model = model_class.from_pretrained(checkpoint)
+
+        if args.task_name=='dnaregression':
+            logger.critical('Altering model for regression...')
+            model.config.num_labels = 1
+            model.config.problem_type='regression'
+            model.classifier.out_features=1
+
+
         model.to(args.device)
         prediction = predict(args, model, tokenizer, prefix=prefix)
 

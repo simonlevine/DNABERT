@@ -84,11 +84,12 @@ class PretrainedConfig(object):
         # Fine-tuning task arguments
         self.architectures = kwargs.pop("architectures", None)
         self.finetuning_task = kwargs.pop("finetuning_task", None)
-        self.num_labels = kwargs.pop("num_labels", 2)
-        self.id2label = kwargs.pop("id2label", {i: "LABEL_{}".format(i) for i in range(self.num_labels)})
-        self.id2label = dict((int(key), value) for key, value in self.id2label.items())
-        self.label2id = kwargs.pop("label2id", dict(zip(self.id2label.values(), self.id2label.keys())))
-        self.label2id = dict((key, int(value)) for key, value in self.label2id.items())
+        self.num_labels = kwargs.pop("num_labels", 1)
+        self.problem_type= kwargs.pop("problem_type", 'regression')
+        # self.id2label = kwargs.pop("id2label", {i: "LABEL_{}".format(i) for i in range(self.num_labels)})
+        # self.id2label = dict((int(key), value) for key, value in self.id2label.items())
+        # self.label2id = kwargs.pop("label2id", dict(zip(self.id2label.values(), self.id2label.keys())))
+        # self.label2id = dict((key, int(value)) for key, value in self.label2id.items())
 
         # Additional attributes without default values
         for key, value in kwargs.items():

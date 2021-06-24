@@ -29,7 +29,7 @@
   "num_attention_heads": 12,
   "num_beams": 1,
   "num_hidden_layers": 12,
-  "num_labels": 2,
+  "num_labels": 1,
   "num_return_sequences": 1,
   "num_rnn_layer": 1,
   "output_attentions": false,
