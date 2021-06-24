@@ -17,3 +17,4 @@ src/transformers.egg-info
 *.fa
 *.gz
 *.bin
+data/jayavulu/hg19/chromFa.tar.gz.1

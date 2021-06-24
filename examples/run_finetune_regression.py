@@ -540,11 +540,15 @@ def predict(args, model, tokenizer, prefix=""):
         if args.do_ensemble_pred:
             result = compute_metrics(pred_task, preds, out_label_ids, probs[:,1])
         else:
-            result = compute_metrics(pred_task, preds, out_label_ids, probs)
+            if args.output_mode == 'regression':
+                result = compute_metrics(pred_task, preds, out_label_ids)
+            else:
+                result = compute_metrics(pred_task, preds, out_label_ids, probs)
         
         pred_output_dir = args.predict_dir
         if not os.path.exists(pred_output_dir):
                os.makedir(pred_output_dir)
+
 
         output_pred_file = os.path.join(pred_output_dir, "pred_results.npy")
         output_probs_file = os.path.join(pred_output_dir, "probs_results.npy")
@@ -552,8 +556,10 @@ def predict(args, model, tokenizer, prefix=""):
         logger.info("***** Pred results {} *****".format(prefix))
         for key in sorted(result.keys()):
             logger.info("  %s = %s", key, str(result[key]))
-        np.save(output_probs_file, probs)
-        np.save(output_pred_file, preds)
+
+        if args.output_mode != 'regression':
+            np.save(output_probs_file, probs)
+        np.save(output_pred_file, preds) # for regression, preds = prob
 
 
 
