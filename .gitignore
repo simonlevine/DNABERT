@@ -18,3 +18,4 @@ src/transformers.egg-info
 *.gz
 *.bin
 data/jayavulu/hg19/chromFa.tar.gz.1
+dnaBERT_pretrained_models/.DS_Store
